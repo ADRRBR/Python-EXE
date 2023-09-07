@@ -223,7 +223,17 @@ class Clientes:
         self.__status = self.__conexao.status
         self.__mensagem = self.__conexao.mensagem
 
+        # Inicia o Retorno JSON
+        clientesJSON = []
+        retornoJSON = []
+
         if self.__status != StatusExecucao.Encontrado:
+            # Retorno JSON
+            retornoJSON.append({'Mensagem:': self.__mensagem,
+                                'Quantidade:': 0
+                              })
+            retornoJSON.append({'Registros:': clientesJSON})
+            self.__JSONClientes = json.dumps(retornoJSON, cls=NpEncoder, indent=4)
             return
 
         listaData = self.__conexao.dataListar
@@ -236,8 +246,6 @@ class Clientes:
 
         listaValor = self.__conexao.valorListar
         gravaValor = self.__conexao.valorGravar
-
-        clientesJSON = []
 
         for indice in range(len(tabSQL)):
             valClientes = {
@@ -257,6 +265,7 @@ class Clientes:
             horaAux = tabSQL.loc[indice, 'hora_diaria_ligacao'].split('.')
             horaAux = horaAux[0]
 
+            # Acrescenta o Retorno JSON
             valClientesJSON = {
                 'pk_cliente':            tabSQL.loc[indice, 'pk_cliente'],
                 'codigo':                tabSQL.loc[indice, 'codigo'],
@@ -270,7 +279,12 @@ class Clientes:
             }
             clientesJSON.append(valClientesJSON)
 
-        self.__JSONClientes = json.dumps(clientesJSON, cls=NpEncoder, indent=4)
+        # Retorno JSON
+        retornoJSON.append({'Mensagem:': 'Consulta efetuada com sucesso',
+                            'Quantidade:': len(tabSQL)
+                          })
+        retornoJSON.append({'Registros:': clientesJSON})
+        self.__JSONClientes = json.dumps(retornoJSON, cls=NpEncoder, indent=4)
 
     # Métodos Privados
     def __VerificaConexao(self):
